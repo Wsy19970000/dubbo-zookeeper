@@ -6,7 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="zookeeperDemo" />
+        <module name="commons-api" />
+        <module name="consumer" />
+        <module name="provider1" />
+        <module name="provider2" />
       </profile>
     </annotationProcessing>
   </component>

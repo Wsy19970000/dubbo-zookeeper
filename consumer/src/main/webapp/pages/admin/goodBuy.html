@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品购买</title>
+    <script type="text/javascript" src="/static/js/jquery-1.8.2.min.js"></script>
+</head>
+<body>
+<center>
+    <table border="1px" width="400px" cellspacing="0px">
+        <thead>
+            <tr>
+                <td colspan="2" align="center" style="font-size: 36px;color: blue">购买商品</td>
+            </tr>
+            <tr>
+                <td>商品编号</td>
+                <td id="goodId"></td>
+            </tr>
+            <tr>
+                <td>商品名称</td>
+                <td id="goodName"></td>
+            </tr>
+            <tr>
+                <td>商品分类</td>
+                <td id="sortName"></td>
+            </tr>
+            <tr>
+                <td>单价(元)</td>
+                <td id="price"></td>
+            </tr>
+            <tr>
+                <td>剩余数量</td>
+                <td id="remaining"></td>
+            </tr>
+            <tr>
+                <td>购买数量</td>
+                <td><input type="text" name="num"></td>
+            </tr>
+            <tr>
+                <td>总金额(元)</td>
+                <td id="cost"></td>
+            </tr>
+            <tr>
+                <td colspan="2"  align="center">
+                    <input type="submit" value="购买" id="gouMai">
+                    <input type="button" value="返回" onclick="history.go(-1)">
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</center>
+<script type="text/javascript">
+    $(function(){
+        //自动请求后台，查询指定商品id的详细信息
+        $.ajax({
+            url:"/consumer/getGoodDetailByGoodId",
+            type:"POST",
+            dataType:"JSON",
+            data:{
+                "goodId":document.URL.split("=")[1]
+            },
+            success:function(rs){
+                //商品编号
+                $("#goodId").html(rs.id);
+                //商品名称
+                $("#goodName").html(rs.name);
+                //商品分类
+                $("#sortName").html(rs.sortName);
+                //单价
+                $("#price").html(rs.price);
+                //库存数量
+                $("#remaining").html(rs.remaining);
+            },
+            error:function(rs){
+                alert("哎呀，出错了");
+            }
+        });
+
+        //自动计算金额
+        $("input[name=num]").blur(function(){
+            //1、获取商品单价
+            var price = $("#price").html();
+            //2、获取商品数量
+            var num = $(this).val();
+            //3、计算总金额
+            var cost = price*num;
+            //4、进行数据回显
+            $("#cost").html(cost);
+        });
+
+        //点击购买触发ajax事件，修改数据库表中商品的库存数量
+        $("#gouMai").click(function(){
+            //获取商品列表信息
+            $.ajax({
+                url:"/consumer/updateGoodKuCun",
+                type:"POST",
+                dataType:"JSON",
+                data:{
+                    "goodId":$("#goodId").html(),
+                    "num":$("input[name=num]").val()
+                },
+                success:function(rs){
+                    window.location.href="/static/pages/admin/goodList.html?flag="+rs;
+                },
+                error:function(rs){
+                    alert("哎呀，出错了");
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

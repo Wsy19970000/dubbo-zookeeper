@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java.mapper.GoodMapper">
+
+    <!--根据文具id查询所有文具信息-->
+	<select id="selectGoods" parameterType="Long" resultType="Map">
+		SELECT gs.name as sortName,gd.* FROM good_sort gs INNER JOIN good_detail gd
+        ON gs.`id`=gd.`sortId`
+        <if test="_parameter!=0">
+        WHERE gd.sortId=#{0}
+    </if>
+	</select>
+
+</mapper>

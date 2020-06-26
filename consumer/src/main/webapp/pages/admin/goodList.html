@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品列表</title>
+    <script type="text/javascript" src="/static/js/jquery-1.8.2.min.js"></script>
+
+</head>
+<body>
+<center>
+    请选择商品分类：
+    <select name="sortId">
+        <option value="0" id="one">全部</option>
+    </select>
+
+    <table border="1px" cellspacing="0px" width="800px">
+        <thead>
+            <tr>
+                <th>商品编号</th>
+                <th>商品名称</th>
+                <th>商品分类</th>
+                <th>产地</th>
+                <th>生产日期</th>
+                <th>单价</th>
+                <th>剩余数量</th>
+                <th>购买</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</center>
+<script type="text/javascript">
+    $(function(){
+        //获取商品列表信息
+        $.ajax({
+            url:"/consumer/getGoodList",
+            type:"POST",
+            dataType:"JSON",
+            success:function(rs){
+                console.log("goodList");
+                var content = "";
+                for(var i in rs){
+                    var map = rs[i];
+                    content+="<tr><td>"+map.id+"</td><td>"+map.name+"</td><td>"+map.sortName+"</td><td>"+map.address+"</td><td>"+map.createDate+"</td><td>"+map.price+"</td><td>"+map.remaining+"</td><td><a href='/static/pages/admin/goodBuy.html?goodId="+map.id+"'>购买</a></td></tr>";
+                }
+                $("tbody").html(content);
+                //回显购买状态
+                //对结果进行回显
+                var flag = document.URL.split("=")[1]+'';
+                console.log("flag="+flag);
+                if(flag=='true'){//从购买页面跳转过来的并且购买成功
+                    console.log("1")
+                    $("tbody").append("<tr><td colspan='8'>购买成功</td></tr>");
+                }else if(flag=='false'){//从购买页面跳转过来的并且购买失败
+                    console.log("2");
+                    $("tbody").append("<tr><td colspan='8'>购买失败</td></tr>");
+                }
+            },
+            error:function(rs){
+                alert("哎呀，出错了");
+            }
+        });
+
+        //自动触发ajax获取商品分类列表
+        $.ajax({
+            url:"/consumer/getGoodSort",
+            type:"POST",
+            dataType:"JSON",
+            success:function(rs){
+                var content = "";
+                for(var i in rs){
+                    content+="<option value='"+rs[i].id+"'>"+rs[i].name+"</option>";
+                }
+                $("#one").after(content);
+            },
+            error:function(rs){
+                alert("哎呀，出错了");
+            }
+        });
+
+        //触发change事件
+        $("select[name=sortId]").change(function(){
+
+            $.ajax({
+                url:"/consumer/getGoodList",
+                type:"POST",
+                dataType:"JSON",
+                data:{
+                    "sortId":$(this).find("option:selected").val()
+                },
+                success:function(rs){
+                    var content = "";
+                    for(var i in rs){
+                        var map = rs[i];
+                        content+="<tr><td>"+map.id+"</td><td>"+map.name+"</td><td>"+map.sortName+"</td><td>"+map.address+"</td><td>"+map.createDate+"</td><td>"+map.price+"</td><td>"+map.remaining+"</td><td><a href='#'>购买</a></td></tr>";
+                    }
+                    $("tbody").html(content);
+                },
+                error:function(rs){
+                    alert("哎呀，出错了");
+                }
+            });
+        });
+
+
+    });
+
+    /*window.onload=function(){
+        //对结果进行回显
+        var flag = document.URL.split("=")[1]+'';
+        console.log("flag="+flag);
+        if(flag=='true'){//从购买页面跳转过来的并且购买成功
+            console.log("1")
+            $("tbody").append("<tr><td colspan='8'>购买成功</td></tr>");
+        }else if(flag=='false'){//从购买页面跳转过来的并且购买失败
+            console.log("2");
+            $("tbody").append("<tr><td colspan='8'>购买失败</td></tr>");
+        }else{
+            console.log("3")
+        }
+    }*/
+</script>
+</body>
+</html>
